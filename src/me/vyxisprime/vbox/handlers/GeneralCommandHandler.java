@@ -8,14 +8,16 @@ import me.vyxisprime.vbox.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.plugin.Plugin;
 
+@SuppressWarnings("unused")
 public class GeneralCommandHandler {
 	static ChatColor darkRed = ChatColor.DARK_RED;
 	static ChatColor darkBlue = ChatColor.DARK_BLUE;
@@ -51,6 +53,38 @@ public class GeneralCommandHandler {
 		gamemodeCommand(sender, cmd, lbl, args);
 		flyCommand(sender, cmd, lbl, args);
 		seenCommand(sender, cmd, lbl, args);
+		tpCommand(sender, cmd, lbl, args);
+		tphereCommand(sender, cmd, lbl, args);
+		tpaCommand(sender, cmd, lbl, args);
+		setspawnCommand(sender, cmd, lbl, args);
+		spawnCommand(sender, cmd, lbl, args);
+		ciCommand(sender, cmd, lbl, args);
+		repairCommand(sender, cmd, lbl, args);
+		worldCommand(sender,cmd,lbl,args);
+	}
+
+	public static void worldCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("world")) {
+			if (a.length == 0) {
+				p.sendMessage(ChatColor.GOLD + "You are currently in world " + ChatColor.RED + p.getWorld().toString().toLowerCase());
+
+			}
+			if (a.length == 1) {
+				Player target = p.getServer().getPlayer(a[0]);
+				if (target == null) {
+					p.sendMessage(ChatColor.RED + "That player is currently not online.");
+
+				}
+				if (target != null) {
+					p.sendMessage(ChatColor.GOLD + "'" + ChatColor.RED + target.getName() + ChatColor.GOLD + "' is currently in " + ChatColor.RED + target.getWorld().toString().toLowerCase());
+
+				}
+			}
+			if (a.length > 1) {
+				p.sendMessage(ChatColor.RED + "Usage: /world [playerName]");
+
+			}
+		}
 	}
 
 	public static void ccCommand(CommandSender s, Command c, String l, String[] a) {
@@ -69,12 +103,8 @@ public class GeneralCommandHandler {
 	public static void kilallCommand(CommandSender s, Command c, String l, String[] a) {
 		if (l.equalsIgnoreCase("clearchat")) {
 			for (Player all : Bukkit.getOnlinePlayers()) {
-				for (int x = 0; x < 120; x++) {
-					all.setHealth(0);
-					if (x == 119) {
-						sM(all, frMsg + "Cleared the chat!");
-					}
-				}
+				all.setHealth(0);
+				sM(all, frMsg + s.getName() + " killed everyone!");
 			}
 		}
 	}
@@ -193,8 +223,7 @@ public class GeneralCommandHandler {
 		}
 	}
 
-	
-	public void tpaCommand(CommandSender s, Command c, String l, String[] a) {
+	public static void tpaCommand(CommandSender s, Command c, String l, String[] a) {
 
 		// TP Ask
 		if (l.equalsIgnoreCase("tpa")) {
@@ -207,7 +236,7 @@ public class GeneralCommandHandler {
 					mittente.sendMessage(frMsg + green + "Request sent...");
 					targetPlayer.sendMessage(frMsg + green + mittente.getName().toString() + " asked to come to you, you have 30 seconds to accept with " + gold + " /tpaccept ");
 					Tpa.put(targetPlayer, mittente);
-					plugin.getServer().getScheduler().runTaskLater((Plugin) this, new Runnable() {
+					plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
 						@SuppressWarnings("static-access")
 						public void run() {
 							GeneralCommandHandler.this.Tpa.remove(targetPlayer);
@@ -219,20 +248,62 @@ public class GeneralCommandHandler {
 			}
 		}
 		// TP accept
-		if (l.equalsIgnoreCase("tpaccept"))
-	    {
-	      Player player1 = (Player)s;
-	      try
-	      {
-	        if (Tpa.containsKey(player1)) {
-	        	
-	        }
-	        ((Player)Tpa.get(player1)).teleport(player1);
-	        Tpa.remove(player1);
-	        ((Player)Tpa.get(player1)).sendMessage(frMsg + green + "Teleported to " + gold + player1.getName().toString());
-	      }
-	      catch (Exception localException2) {}
-	    }
+		if (l.equalsIgnoreCase("tpaccept")) {
+			Player player1 = (Player) s;
+			try {
+				if (Tpa.containsKey(player1)) {
+
+				}
+				((Player) Tpa.get(player1)).teleport(player1);
+				Tpa.remove(player1);
+				((Player) Tpa.get(player1)).sendMessage(frMsg + green + "Teleported to " + gold + player1.getName().toString());
+			} catch (Exception localException2) {
+			}
+		}
+	}
+
+	public static void setspawnCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("setspawn")) {
+			if (a.length > 0) {
+				sM(p, frMsg + red + "Please only use this command as /setspawn");
+			}
+			Player p = (Player) s;
+			plugin.getConfig().set("spawn.world", p.getLocation().getWorld().getName());
+			plugin.getConfig().set("spawn.x", Double.valueOf(p.getLocation().getX()));
+			plugin.getConfig().set("spawn.y", Double.valueOf(p.getLocation().getY()));
+			plugin.getConfig().set("spawn.z", Double.valueOf(p.getLocation().getZ()));
+			p.sendMessage(frMsg + green + "You have set Spawn location!");
+		}
+	}
+
+	public static void spawnCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("spawn")) {
+			Player p = (Player) s;
+
+			World w = Bukkit.getServer().getWorld(plugin.getConfig().getString("spawn.world"));
+			double x = plugin.getConfig().getDouble("spawn.x");
+			double y = plugin.getConfig().getDouble("spawn.y");
+			double z = plugin.getConfig().getDouble("spawn.z");
+			p.teleport(new Location(w, x, y, z));
+			p.sendMessage(frMsg + green + "You have teleported to Spawn!");
+		}
+	}
+
+	public static void ciCommand(CommandSender s, Command c, String l, String[] a) {
+		Player p = (Player) s;
+
+		p.getInventory().clear();
+
+		p.sendMessage(frMsg + gold + "You have cleared your Inventory.");
+
+	}
+
+	public static void repairCommand(CommandSender s, Command c, String l, String[] a) {
+		p = (Player) s;
+		if (l.equalsIgnoreCase("repair")) {
+			p.getItemInHand().setDurability((short) 0);
+			sM(p, ChatColor.GOLD + "Your " + ChatColor.RED + p.getItemInHand().toString().toLowerCase() + ChatColor.GOLD + " has been repaired");
+		}
 	}
 
 	public static void bC(Player p, String s) {
