@@ -1,0 +1,13 @@
+Changelog
+1.0 initial first commit
+	- added all the interaction commands to the InteractionCommandHandler
+	- Working on the General Command Handler.
+	- 
+	
+TODO:
+	- ConfigHandler
+	- Spawn/SpawnSet
+	- Homes/SetHome
+	- Warps
+	- TPall.
+	- & More
