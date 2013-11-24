@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-@SuppressWarnings("unused")
 public class GeneralCommandHandler {
 	static ChatColor darkRed = ChatColor.DARK_RED;
 	static ChatColor darkBlue = ChatColor.DARK_BLUE;
@@ -60,7 +59,29 @@ public class GeneralCommandHandler {
 		spawnCommand(sender, cmd, lbl, args);
 		ciCommand(sender, cmd, lbl, args);
 		repairCommand(sender, cmd, lbl, args);
-		worldCommand(sender,cmd,lbl,args);
+		worldCommand(sender, cmd, lbl, args);
+		speedCommand(sender, cmd, lbl, args);
+	}
+
+	public static void speedCommand(CommandSender s, Command c, String l, String[] a) {
+		p = (Player) s;
+		if (l.equalsIgnoreCase("speed")) {
+			if (a.length == 0) {
+				p.sendMessage(ChatColor.RED + "Not enough args! /Speed <Speed>");
+			}
+			if (a.length == 1) {
+				p.sendMessage(ChatColor.GOLD + "Changed your fly speed!");
+				if (p.isFlying()) {
+					p.setFlySpeed(4.0F);
+				}
+				if (!p.isFlying()) {
+					p.setWalkSpeed(4.0F);
+				}
+			}
+			if (a.length > 1) {
+				p.sendMessage(ChatColor.RED + "/speed <speed>");
+			}
+		}
 	}
 
 	public static void worldCommand(CommandSender s, Command c, String l, String[] a) {
@@ -272,6 +293,7 @@ public class GeneralCommandHandler {
 			plugin.getConfig().set("spawn.x", Double.valueOf(p.getLocation().getX()));
 			plugin.getConfig().set("spawn.y", Double.valueOf(p.getLocation().getY()));
 			plugin.getConfig().set("spawn.z", Double.valueOf(p.getLocation().getZ()));
+			plugin.saveConfig();
 			p.sendMessage(frMsg + green + "You have set Spawn location!");
 		}
 	}
@@ -285,7 +307,7 @@ public class GeneralCommandHandler {
 			double y = plugin.getConfig().getDouble("spawn.y");
 			double z = plugin.getConfig().getDouble("spawn.z");
 			p.teleport(new Location(w, x, y, z));
-			p.sendMessage(frMsg + green + "You have teleported to Spawn!");
+			p.sendMessage(frMsg + green + "You been have teleported to Spawn!");
 		}
 	}
 
