@@ -1,7 +1,6 @@
 package me.vyxisprime.vbox;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -12,14 +11,13 @@ import me.vyxisprime.vbox.handlers.GeneralCommandHandler;
 import me.vyxisprime.vbox.handlers.InteractionCommandHandler;
 import me.vyxisprime.vbox.listeners.CapsLockListener;
 import me.vyxisprime.vbox.listeners.CurseWordListener;
+import me.vyxisprime.vbox.listeners.PlayerListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -59,7 +57,7 @@ public class Main extends JavaPlugin {
 	public int capsInRow;
 	public int totalCapsPercentage;
 	static boolean dev = false;
-	public static String maindir = "plugins/BanReport/";
+	public static String maindir = "plugins/vBox/";
 	public static final Logger log = Logger.getLogger("Minecraft");
 	private final PlayerListener playerListener = new PlayerListener(this);
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -93,7 +91,7 @@ public class Main extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new Events(), this);
 		Bukkit.getPluginManager().registerEvents(new CapsLockListener(this), this);
 		Bukkit.getPluginManager().registerEvents(new CurseWordListener(), this);
-		Bukkit.getPluginManager().registerEvent(new PlayerListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
 		this.logger.info(frMsg + " setting up MySQL Database");
 		this.db = new MySQLDatabase(this);
 		this.logger.info(frMsg + " " + pFile.getVersion() + " has been succesfully enabled!");
