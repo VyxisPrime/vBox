@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import me.vyxisprime.vbox.Main;
+import me.vyxisprime.vbox.util.Vars;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -61,6 +62,7 @@ public class GeneralCommandHandler {
 		repairCommand(sender, cmd, lbl, args);
 		worldCommand(sender, cmd, lbl, args);
 		speedCommand(sender, cmd, lbl, args);
+		reloadCommand(sender, cmd, lbl, args);
 	}
 
 	public static void speedCommand(CommandSender s, Command c, String l, String[] a) {
@@ -325,6 +327,42 @@ public class GeneralCommandHandler {
 		if (l.equalsIgnoreCase("repair")) {
 			p.getItemInHand().setDurability((short) 0);
 			sM(p, ChatColor.GOLD + "Your " + ChatColor.RED + p.getItemInHand().toString().toLowerCase() + ChatColor.GOLD + " has been repaired");
+		}
+	}
+
+	public static void reloadCommand(CommandSender s, Command c, String l, String[] a) {
+		p = (Player) s;
+		if ((l.equalsIgnoreCase("capslock")) && (a.length == 0)) {
+			sM(p, frMsg + gold + "Current commands: " + darkRed + "/vBox (reload");
+
+		}
+		if ((l.equalsIgnoreCase("vBox")) && (a[0].equalsIgnoreCase("reload"))) {
+			if (plugin.loadConfig()) {
+				sM(p, frMsg + gold + "Config reloaded!");
+			} else {
+				sM(p, frMsg + gold + "Config failed to reload!");
+			}
+		}
+	}
+
+	public static void addcursewordCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("curseword") && a[0].equalsIgnoreCase("add")) {
+			if (a.length > 0) {
+				s.sendMessage(ChatColor.GOLD + "You need to provide a word to filter.");
+				s.sendMessage(ChatColor.DARK_RED + "Correct Usage: /curseprevention add <word>");
+			} else {
+
+				if (!Vars.censoredwords.contains(a[1])) {
+					Vars.censoredwords.add(a[1]);
+					plugin.getConfig().set("censoredwords", a[1]);
+					s.sendMessage(ChatColor.GOLD + "Word has been filtered!");
+					plugin.saveConfig();
+				} else {
+					s.sendMessage(ChatColor.GOLD + "Word was already filtered!");
+				}
+			}
+		}else{
+			sM(p, frMsg + red + "Error: please add arguments to the command /curseword add <word>");
 		}
 	}
 
