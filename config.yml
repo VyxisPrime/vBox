@@ -1,13 +1,29 @@
-# This config file was created by xFlakesID/Vyxis & PsychoCarrot
+# 
+# +--------------------------------------+
+# |                 INFO                 |
+# +--------------------------------------+
+# If you want to use special characters in this document, such as accented letters, you MUST save the file as UTF-8, not ANSI
+# If any Errors show up when vBox loads pelase double check these points
+#    - No tabes are used in the YAML file. YAML only allows spaces
+#    - Indents are correct
+#    - Check all Apostrophes if they are correctly placed.
+#	 - that text with symbols in it are enclosed in single or double quotes.
 
-# Spawn Info
-# DO NOT TOUCH
+# +--------------------------------------+
+# |                 SPAWN                |
+# +--------------------------------------+
+# Please do NOT touch this, This is to locate your set spawn!
 spawn.world:
 spawn.x:
 spawn.y:
 spawn.z:
 
+# +--------------------------------------+
+# |                 CHAT                 |
+# +--------------------------------------+
+
 # Enable/disable entire plugin
+# default enableNoCaps = true
 enableNoCaps: true
 
 # Enable/disable overriding of messages when caps detected
@@ -52,3 +68,23 @@ censoredwords:
 - arse
 - arsehole
 - cunt
+# +--------------------------------------+
+# |                MySQL                 |
+# +--------------------------------------+
+
+# If you want to use MySQL for this plugin
+use-mysql: true
+# Please set your MySQL Credentials Here!
+mysql-user: minecraft
+mysql-password: root
+mysql-database: vbox
+
+# +--------------------------------------+
+# |             BAN SYSTEM               |
+# +--------------------------------------+
+
+broadcast.warn: "&6You were warned by &e%admin%&6 Reason &e%reason%"
+broadcast.Kick: "&6Player &e%victim%&6 was kicked by &e%admin%&6! Reason: &e%reason%"
+broadcast.TempBan: "&6Player &e%victim%&6 was temp-banned by &e%admin%&6 for &e%time% &6Reason: &e%reason%"
+broadcast.Ban: "&6Player &e%victim%&6 was banned by &e%admin%&6! Reason: &e%reason%"
+broadcast.Unban: "&e%victim%&6 was unbanned by &e%admin%&6!"

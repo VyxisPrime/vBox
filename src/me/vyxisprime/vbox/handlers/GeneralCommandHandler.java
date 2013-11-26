@@ -361,9 +361,57 @@ public class GeneralCommandHandler {
 					s.sendMessage(ChatColor.GOLD + "Word was already filtered!");
 				}
 			}
-		}else{
+		} else {
 			sM(p, frMsg + red + "Error: please add arguments to the command /curseword add <word>");
 		}
+	}
+
+	public static boolean bansystemCommands(CommandSender s, Command c, String l, String[] a) {
+		String[] trimmedArgs = a;
+		if (l.equals("baninfo")) {
+			return plugin.banInfo(s, trimmedArgs);
+		}
+		if (l.equals("addinfo")) {
+			return plugin.addInfo(s, trimmedArgs);
+		}
+		if (l.equals("removeinfo")) {
+			return plugin.removeInfo(s, trimmedArgs);
+		}
+		if (l.equals("bantp")) {
+			return plugin.banTp(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("ban")) {
+			return plugin.banPlayer(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("unban")) {
+			return plugin.unbanPlayer(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("kick")) {
+			return plugin.kickPlayer(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("banip")) {
+			return plugin.banIP(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("tempban")) {
+			return plugin.tempBan(s, trimmedArgs).booleanValue();
+		}
+		if (l.equals("banexport")) {
+			if (a.length < 1) {
+				return plugin.exportBans(s);
+			}
+		}
+		if (l.equals("banimport")) {
+			return plugin.importBans(s);
+		}
+		if (l.equals("warn")) {
+			return plugin.warnPlayer(s, trimmedArgs);
+		}
+		if (l.equals("warnings")) {
+			return plugin.viewWarnings(s, trimmedArgs);
+		}
+		return false;
+		
+		
 	}
 
 	public static void bC(Player p, String s) {

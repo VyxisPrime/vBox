@@ -1,0 +1,8 @@
+author: [Vyxis, PsychoCarrot]
+database: false
+description: vBox adds usefull commands to your server and has a advanced Banning
+  system implemented
+main: me.vyxis.vbox.Main
+name: vBox
+startup: startup
+version: '1.0'
