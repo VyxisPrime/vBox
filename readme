@@ -8,7 +8,7 @@ Changelog
 	- Added an EventHandler 
 	- Added GeneralCommandHandler
 1.2
-    - Created ConfigHandler
+	- Created ConfigHandler
 	- Updated Events
 	- Implemented more Commands
 1.3
@@ -19,9 +19,9 @@ Changelog
 	- Added MySQL Implementation
 	- Added PlayerListener
 1.5 
-    - Started on Banning System
+	- Started on Banning System
 1.6
-    - Finished Banning System
+	- Finished Banning System
 	- Made Config File User Friedly
 	- added plugin.yml
 	- Added Metrics for MCStats.com

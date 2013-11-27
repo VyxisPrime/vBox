@@ -3,11 +3,11 @@
 # |                 INFO                 |
 # +--------------------------------------+
 # If you want to use special characters in this document, such as accented letters, you MUST save the file as UTF-8, not ANSI
-# If any Errors show up when vBox loads pelase double check these points
-#    - No tabes are used in the YAML file. YAML only allows spaces
+# If any Errors show up when vBox loads please double check these points
+#    - No tabs are used in the YAML file. YAML only allows spaces
 #    - Indents are correct
 #    - Check all Apostrophes if they are correctly placed.
-#	 - that text with symbols in it are enclosed in single or double quotes.
+#    - that text with symbols in it are enclosed in single or double quotes.
 
 # +--------------------------------------+
 # |                 SPAWN                |
@@ -22,7 +22,6 @@ spawn.z:
 # |                 CHAT                 |
 # +--------------------------------------+
 
-# Enable/disable entire plugin
 # default enableNoCaps = true
 enableNoCaps: true
 
