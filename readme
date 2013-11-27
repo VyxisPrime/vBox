@@ -4,10 +4,28 @@ Changelog
 	- Working on the General Command Handler.
 	- Easy main settup
 	- Addedeasy color config
-	
+1.1 
+	- Added an EventHandler 
+	- Added GeneralCommandHandler
+1.2
+    - Created ConfigHandler
+	- Updated Events
+	- Implemented more Commands
+1.3
+	- Implemented Curse and Capslock Preventions
+	- Vars Util added
+	- Added adiotional Commands
+1.4
+	- Added MySQL Implementation
+	- Added PlayerListener
+1.5 
+    - Started on Banning System
+1.6
+    - Finished Banning System
+	- Made Config File User Friedly
+	- added plugin.yml
+	- Added Metrics for MCStats.com
 TODO:
-	- ConfigHandler
-	- Spawn/SpawnSet
 	- Homes/SetHome
 	- Warps
 	- TPall.
