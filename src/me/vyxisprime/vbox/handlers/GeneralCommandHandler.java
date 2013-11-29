@@ -421,4 +421,28 @@ public class GeneralCommandHandler {
 	public static void sM(Player p, String s) {
 		p.sendMessage(s);
 	}
+	
+	public static void getinfoCommand(CommandSender s, Command c, String l, String[] a) {
+		p = (Player) s;
+		if ((l.equalsIgnoreCase("getinfo")) && (a.length == 1)) {
+			s.sendMessage(ChatColor.GOLD + "+" + ChatColor.GOLD + "------------------------" + ChatColor.GOLD + "+");
+			s.sendMessage(ChatColor.AQUA + "IP:" + ChatColor.DARK_AQUA +p.getAddress().getAddress());
+			s.sendMessage(ChatColor.AQUA + "EXP:" + ChatColor.DARK_AQUA +p.getExp());
+			s.sendMessage(ChatColor.AQUA + "EntityID:" + ChatColor.DARK_AQUA +p.getEntityId());
+			s.sendMessage(ChatColor.AQUA + "First Played:" + ChatColor.DARK_AQUA +p.getFirstPlayed());
+			s.sendMessage(ChatColor.AQUA + "Fly Speed:" + ChatColor.DARK_AQUA +p.getFlySpeed());
+			s.sendMessage(ChatColor.AQUA + "Food:" + ChatColor.DARK_AQUA +p.getFoodLevel());
+			s.sendMessage(ChatColor.AQUA + "Health:" + ChatColor.DARK_AQUA +p.getHealth());
+			s.sendMessage(ChatColor.AQUA + "PlayerTime:" + ChatColor.DARK_AQUA +p.getPlayerTime());
+			s.sendMessage(ChatColor.AQUA + "Ticks Lived:" + ChatColor.DARK_AQUA +p.getTicksLived());
+			s.sendMessage(ChatColor.AQUA + "Item in hand:" + ChatColor.DARK_AQUA +p.getItemInHand().getType().getId());
+			s.sendMessage(ChatColor.AQUA + "Gamemode:" + ChatColor.DARK_AQUA +p.getGameMode().name());
+			s.sendMessage(ChatColor.AQUA + "Position:" + ChatColor.DARK_AQUA + "X:" +p.getLocation().getBlockX() + "| Z:" + p.getLocation().getBlockZ() + "|Y:" + p.getLocation().getBlockY()) ;
+			s.sendMessage(ChatColor.AQUA + "Unique ID:" + ChatColor.DARK_AQUA +p.getUniqueId());
+			s.sendMessage(ChatColor.AQUA + "World:" + ChatColor.DARK_AQUA +p.getWorld().getName());
+			s.sendMessage(ChatColor.AQUA + "EyeHeight:" + ChatColor.DARK_AQUA +p.getEyeHeight());
+			s.sendMessage(ChatColor.AQUA + "BedLocation:" + ChatColor.DARK_AQUA +p.getBedSpawnLocation().getBlockX() + "| Z:" + p.getBedSpawnLocation().getBlockZ() + "|Y:" + p.getBedSpawnLocation().getBlockY());
+			s.sendMessage(ChatColor.GOLD + "+" + ChatColor.GOLD + "------------------------" + ChatColor.GOLD + "+");
+		}
+	}
 }
