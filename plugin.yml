@@ -5,4 +5,7 @@ description: vBox adds usefull commands to your server and has a advanced Bannin
 main: me.vyxis.vbox.Main
 name: vBox
 startup: startup
-version: '1.0'
+version: '0.1a'
+
+commands:
+   

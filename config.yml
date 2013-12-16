@@ -1,4 +1,4 @@
-# 
+# Created by VyxisPrime
 # +--------------------------------------+
 # |                 INFO                 |
 # +--------------------------------------+
@@ -13,6 +13,7 @@
 # |                 SPAWN                |
 # +--------------------------------------+
 # Please do NOT touch this, This is to locate your set spawn!
+
 spawn.world:
 spawn.x:
 spawn.y:
@@ -48,6 +49,10 @@ capsInRow: 5
 # Maximum percentage of caps in the message to allow
 totalCapsPercentage: 50
 
+# +--------------------------------------+
+# |                 Caps                 |
+# +--------------------------------------+
+
 # Phrases to ignore when forcing lowercase
 whitelist:
   - "I"
@@ -58,7 +63,11 @@ whitelist:
   - ":P"
   - "LOL"
   
+# +--------------------------------------+
+# |               Cursing                |
+# +--------------------------------------+ 
 # Cursewords Censored words
+
 censoredwords:
 - fuck
 - shit
@@ -67,14 +76,30 @@ censoredwords:
 - arse
 - arsehole
 - cunt
+
+# +--------------------------------------+
+# |              IPHiding                |
+# +--------------------------------------+
+# All the messages and configurable parts of what the plugin has to do when someone is spamming with ip's
+
+IP.Message.NotPermitted: "&f[&avBox&f]&cYou're not permitted to spam with IP'S"
+IP.Message.KickMessage: "&cYou got kicked for: Spamming with IP's"
+IP.Message.BanMessage: "&cYou got banned for: Spamming with IP's"
+
+# Config if they spam a IP if they will be kicked or banned.
+
+IP.Action.Kick: true
+IP.Action.Ban: false
+
 # +--------------------------------------+
 # |                MySQL                 |
 # +--------------------------------------+
 
 # If you want to use MySQL for this plugin
 use-mysql: true
+
 # Please set your MySQL Credentials Here!
-mysql-user: minecraft
+mysql-user: jdbc:mysql://localhost:3306/minecraft
 mysql-password: root
 mysql-database: vbox
 
@@ -82,8 +107,54 @@ mysql-database: vbox
 # |             BAN SYSTEM               |
 # +--------------------------------------+
 
-broadcast.warn: "&6You were warned by &e%admin%&6 Reason &e%reason%"
+# Maximum warning until they get banned
+max-warnings: 6;
+
+# Broadcast messages This is what the server publicly sees when you warn/ban/kick them 
+broadcast.warn: "&6Player &e%victim%&6 was banned by &e%admin%&6! Reason: &e%reason%"
 broadcast.Kick: "&6Player &e%victim%&6 was kicked by &e%admin%&6! Reason: &e%reason%"
 broadcast.TempBan: "&6Player &e%victim%&6 was temp-banned by &e%admin%&6 for &e%time% &6Reason: &e%reason%"
 broadcast.Ban: "&6Player &e%victim%&6 was banned by &e%admin%&6! Reason: &e%reason%"
 broadcast.Unban: "&e%victim%&6 was unbanned by &e%admin%&6!"
+
+# User messages, This is what the user seeys when you warn/ban/kick them.
+user.warn: "&6You were warned by &e%admin%&6 Reason &e%reason%"
+user.Kick: "&6You were kicked by &e%admin%. &6Reason: &e%reason%"
+user.TempBan: "&6You were temp-banned by %admin% for %time% Reason: &e%reason%"
+user.Ban: "&6You were banned by &e%admin%. &6Reason: &e%reason%"
+user.IPban: "&6Your IP is banned."
+
+# +--------------------------------------+
+# |                 KITS                 |
+# +--------------------------------------+
+# SimpleKit's config file. The KitName can be what ever you want it to be but it must be lowercase!
+# The ItemID is the ItemsID. The ItemMetaID it the ID for RedWool for example, 34:14.CheckForLatestVersion: true
+#
+# CheckForLatestVersion set to true means that it will check for latest version,
+# If there is a new version, It will say on the console.
+checkForLatestVersion: true
+# FirstJoinKitName is Case SENSITIVE! FirstJoinWorld is the world the player first spawns on when join for the first time!
+firstJoinKitName: starter
+firstJoinWorld: world
+# GroupOn; Do you want to use the groups feature?
+#(Requires Vault), If set to false, the groups section under cooldown will be ignored!
+GroupOn: false
+
+kits:
+  starter:
+    items:
+    - 272 0 1
+    - 275 0 1
+    - 274 0 1
+    - 273 0 1
+    - 297 0 5
+# The Cooldown time's are messured in seconds.
+    cooldown: 7200
+# The groups: section is for if you want to have your kit to be accessable to 
+# certain ranks. If you have groups enabled, then any player with that
+# The groups: section is for if you want to have your kit to be accessable to certain ranks. If you have groups enabled, then any player with that
+# Rank will have the kit even if they don't have the vbox.kit.<KitName> permission.
+
+    groups:
+    - Admin
+

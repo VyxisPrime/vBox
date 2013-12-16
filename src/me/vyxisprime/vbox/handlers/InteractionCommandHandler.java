@@ -96,7 +96,7 @@ public class InteractionCommandHandler {
 			}
 		} else if (args.length == 1) {
 			if (p.getServer().getPlayer(args[0]) != null) {
-				sM(p, frMsg + red + "it's pretty hard to kiss yourself, just don't try it ;) ");
+				sM(p, frMsg + red + "it's pretty hard to troll yourself, just don't try it ;) ");
 			} else {
 				tp = p.getServer().getPlayer(args[0]);
 				if (p.getServer().getPlayer(args[0]) != null) {
@@ -112,12 +112,12 @@ public class InteractionCommandHandler {
 	public static void runoverCommand(CommandSender sender, Command cmd, String lbl, String[] args) {
 		p = (Player) sender;
 		Player tp = p.getServer().getPlayer(args[0]);
-		if (lbl.equalsIgnoreCase("troll")) {
+		if (lbl.equalsIgnoreCase("runover")) {
 			if (args.length == 0) {
 				p.sendMessage(frMsg + red + "you can only run over a player!");
 			} else if (args.length == 1) {
 				if (p.getServer().getPlayer(args[0]) != null) {
-					sM(p, frMsg + red + "it's pretty hard to kiss yourself, just don't try it ;) ");
+					sM(p, frMsg + red + "it's pretty hard to run yourself over, just don't try it ;) ");
 				} else {
 					tp = p.getServer().getPlayer(args[0]);
 					if (p.getServer().getPlayer(args[0]) != null) {

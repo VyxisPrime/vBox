@@ -2,9 +2,13 @@ package me.vyxisprime.vbox.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import me.vyxisprime.vbox.Main;
+import me.vyxisprime.vbox.listeners.KitListener;
 import me.vyxisprime.vbox.util.Vars;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,10 +17,17 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffectType;
 
 public class GeneralCommandHandler {
 	static ChatColor darkRed = ChatColor.DARK_RED;
@@ -39,17 +50,19 @@ public class GeneralCommandHandler {
 	static ChatColor white = ChatColor.WHITE;
 	static public String frMsg = white + "[" + green + "vBox" + white + "]" + reset;
 
+	public static Permission perm = null;
 	static Player p;
 	static Player tp;
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static HashMap<Player, Player> Tpa = new HashMap();
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static ArrayList<Player> godModdedPlayers = new ArrayList();
 	static Main plugin;
 
 	public static void registerCommands(CommandSender sender, Command cmd, String lbl, String[] args) {
 		ccCommand(sender, cmd, lbl, args);
 		kilallCommand(sender, cmd, lbl, args);
 		afkCommand(sender, cmd, lbl, args);
-		tpCommand(sender, cmd, lbl, args);
 		gamemodeCommand(sender, cmd, lbl, args);
 		flyCommand(sender, cmd, lbl, args);
 		seenCommand(sender, cmd, lbl, args);
@@ -63,6 +76,229 @@ public class GeneralCommandHandler {
 		worldCommand(sender, cmd, lbl, args);
 		speedCommand(sender, cmd, lbl, args);
 		reloadCommand(sender, cmd, lbl, args);
+		bansystemCommands(sender, cmd, lbl, args);
+		addcursewordCommand(sender, cmd, lbl, args);
+		kitsCommand(sender, cmd, lbl, args);
+		kitCommand(sender, cmd, lbl, args);
+		vanishCommand(sender, cmd, lbl, args);
+		godCommand(sender, cmd, lbl, args);
+		weatherCommand(sender, cmd, lbl, args);
+		timeCommand(sender, cmd, lbl, args);
+	}
+
+	public static void weatherCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("weather")) {
+			if (a.length == 0) {
+				sM(p, frMsg + red + "Usage: /weather <Storm/Sun/Thunder>");
+			} else if (a.length == 1) {
+				if (a[0].equalsIgnoreCase("storm")) {
+					p.getWorld().setStorm(true);
+					p.getWorld().setThundering(true);
+					sM(p, frMsg + gold + "You've made it storm!");
+				} else if (a[0].equalsIgnoreCase("sun")) {
+					p.getWorld().setStorm(false);
+					p.getWorld().setThundering(false);
+					sM(p, frMsg + gold + "You've made it sunny!");
+				} else if (a[0].equalsIgnoreCase("thunder")) {
+					p.getWorld().setThundering(true);
+				} else {
+					sM(p, frMsg + red + "Arguments not recognised");
+				}
+			} else {
+				sM(p, frMsg + red + "Usage: /weather <Storm/Sun/Thunder>");
+			}
+		}
+	}
+
+	public static void timeCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("time")) {
+			if (a.length == 0) {
+				sM(p, frMsg + red + "Usage: /time <day/night>");
+			} else if (a.length == 1) {
+				if (a[0].equalsIgnoreCase("day")) {
+					p.getWorld().setTime(0l);
+					sM(p, frMsg + blue + "you've  set the time to day!");
+					bC(p, frMsg + p.getName() + blue + " has set the time to day!");
+				} else if (a[0].equalsIgnoreCase("Night")) {
+					p.getWorld().setTime(1800l);
+					sM(p, frMsg + blue + "you've  set the time to night!");
+					bC(p, frMsg + p.getName() + blue + " has set the time to night!");
+				}
+			} else {
+				sM(p, frMsg + red + "Usage: /time <day/night>");
+			}
+		}
+	}
+
+	public static void godCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("god")) {
+			if (p.hasPermission("vbox.general.god.other")) {
+				if (a.length > 1) {
+					sM(p, frMsg + red + "Correct usage: /god or /god <name>");
+
+				} else if (a.length == 1) {
+					try {
+						toggleGodMode(Bukkit.getServer().getPlayer(a[0]));
+					} catch (Exception e) {
+						sM(p, frMsg + red + "Can't find " + a[0] + ".");
+					}
+
+				}
+			} else {
+				sM(p, frMsg + red + "Permission denied!");
+			}
+			if (s.hasPermission("vbox.general.god")) {
+				if ((s instanceof Player)) {
+					p = (Player) s;
+					toggleGodMode(p);
+				} else {
+					sM(p, frMsg + red + "Insufficient permissions");
+				}
+			}
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static void toggleGodMode(Player player) {
+		setMetadata(player, "Godmode", Boolean.valueOf(!isGod(player)));
+		plugin.logger.fine("[" + player.getDisplayName() + "] Toggled godmode " + isGod(player));
+		if (isGod(player)) {
+			player.sendMessage(frMsg + gold + "Godmode activated!");
+		} else {
+			sM(p, frMsg + gold + "Godmode Deactivated");
+		}
+	}
+
+	public static boolean isGod(Player player) {
+		return getMetadata(player, "Godmode").booleanValue();
+	}
+
+	public static void setMetadata(Player player, String key, Object value) {
+		player.setMetadata(key, new FixedMetadataValue(plugin, value));
+	}
+
+	@SuppressWarnings("static-access")
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerDamage(EntityDamageEvent evt) {
+		if ((evt.getEntity() instanceof Player)) {
+			Player player = (Player) evt.getEntity();
+			if (isGod(player)) {
+				evt.setCancelled(true);
+				player.setFireTicks(0);
+				player.removePotionEffect(PotionEffectType.BLINDNESS);
+				player.removePotionEffect(PotionEffectType.CONFUSION);
+				player.removePotionEffect(PotionEffectType.POISON);
+				player.removePotionEffect(PotionEffectType.WITHER);
+				player.removePotionEffect(PotionEffectType.WEAKNESS);
+				player.removePotionEffect(PotionEffectType.SLOW);
+				plugin.logger.finest("[" + player.getDisplayName() + "] Damage by " + evt.getCause().name() + " cancelled.");
+			}
+		}
+	}
+
+	public static Boolean getMetadata(Player player, String key) {
+		List<MetadataValue> values = player.getMetadata(key);
+		for (MetadataValue value : values) {
+			if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
+				if (value.value() != null) {
+					return Boolean.valueOf(value.asBoolean());
+				}
+				return Boolean.valueOf(false);
+			}
+		}
+		return Boolean.valueOf(false);
+	}
+
+	@SuppressWarnings("static-access")
+	public static boolean kitsCommand(CommandSender s, Command c, String l, String[] a) {
+		if ((s instanceof ConsoleCommandSender)) {
+			plugin.logger.warning(plugin.frMsg + "You may not use this command from the console!");
+			return false;
+		} else if ((s instanceof Player)) {
+			if (l.equalsIgnoreCase("kits")) {
+				if ((p.hasPermission("vBox.kits.view")) || (p.isOp())) {
+					if (a.length == 0) {
+						return KitListener.getKitList(p);
+					}
+					if (a.length == 1) {
+						sM(p, frMsg + ChatColor.RED + "Use /kit <KitName> to get a Kit.");
+					} else if (a.length >= 2) {
+						sM(p, frMsg + ChatColor.RED + "Incorrect Usage!");
+						sM(p, frMsg + ChatColor.RED + "Usage1: /kits");
+						sM(p, frMsg + ChatColor.RED + "Usage2: /kit <KitName>");
+					}
+				} else {
+					sM(p, frMsg + ChatColor.RED + "Sorry, You don't have permissions to view the Kit List.");
+				}
+			}
+		}
+		return true;
+	}
+
+	public static boolean kitCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("kit")) {
+			if (a.length < 1) {
+				sM(p, frMsg + red + "Incorrect Usage");
+				sM(p, frMsg + red + "Usage 1: /kits");
+				sM(p, frMsg + red + "Usage 2: /kit <KitName>");
+			} else if (a.length == 1) {
+				String kit = a[0].toLowerCase();
+				if (plugin.getConfig().contains("kits." + kit)) {
+					boolean groupon = plugin.getConfig().getBoolean("GroupOn");
+					if (groupon) {
+						List<String> groupList = plugin.getConfig().getStringList("kits." + kit.toLowerCase() + ".groups");
+						String playergroups = perm.getPrimaryGroup(p);
+						Iterator<String> iterator = groupList.iterator();
+						if (iterator.hasNext()) {
+							String group = (String) iterator.next();
+							if (playergroups.contains(group)) {
+								if (KitListener.onCooldown(p, kit)) {
+									return KitListener.difference(p, kit);
+								}
+								return KitListener.giveKit(p, kit);
+							}
+							if ((p.hasPermission("vbox.kits." + kit)) || (p.isOp())) {
+								if (KitListener.onCooldown(p, kit)) {
+									return KitListener.difference(p, kit);
+								}
+								return KitListener.giveKit(p, kit);
+							}
+							if ((p.hasPermission("vbox.kits.*")) || (p.isOp())) {
+								if (KitListener.onCooldown(p, kit)) {
+									return KitListener.difference(p, kit);
+								}
+								return KitListener.giveKit(p, kit);
+							}
+							sM(p, frMsg + ChatColor.RED + "Sorry, You do not have permissions to use kit: " + kit + ".");
+							return true;
+						}
+					} else if (!groupon) {
+						if ((p.hasPermission("vbox.kits." + kit)) || (p.isOp())) {
+							if (KitListener.onCooldown(p, kit)) {
+								return KitListener.difference(p, kit);
+							}
+							return KitListener.giveKit(p, kit);
+						}
+						if ((p.hasPermission("vbox.kits.*")) || (p.isOp())) {
+							if (KitListener.onCooldown(p, kit)) {
+								return KitListener.difference(p, kit);
+							}
+							return KitListener.giveKit(p, kit);
+						}
+						sM(p, frMsg + ChatColor.RED + "Sorry, You do not have permissions to use kit: " + kit + ".");
+						return true;
+					}
+				} else {
+					sM(p, frMsg + ChatColor.RED + "Sorry! The kit '" + kit + "' doesn't exist!");
+					return true;
+				}
+			} else if (a.length >= 2) {
+				sM(p, frMsg + ChatColor.RED + "Incorrect Usage!");
+				sM(p, frMsg + ChatColor.RED + "Usage1: /kits");
+				sM(p, frMsg + ChatColor.RED + "Usage2: /kit <KitName>");
+			}
+		}
+		return true;
 	}
 
 	public static void speedCommand(CommandSender s, Command c, String l, String[] a) {
@@ -111,7 +347,7 @@ public class GeneralCommandHandler {
 	}
 
 	public static void ccCommand(CommandSender s, Command c, String l, String[] a) {
-		if (l.equalsIgnoreCase("clearchat")) {
+		if (l.equalsIgnoreCase("clearchat") || l.equalsIgnoreCase("cc")) {
 			for (Player all : Bukkit.getOnlinePlayers()) {
 				for (int x = 0; x < 120; x++) {
 					all.sendMessage(" ");
@@ -125,9 +361,9 @@ public class GeneralCommandHandler {
 
 	public static void kilallCommand(CommandSender s, Command c, String l, String[] a) {
 		if (l.equalsIgnoreCase("clearchat")) {
-			for (Player all : Bukkit.getOnlinePlayers()) {
-				all.setHealth(0);
-				sM(all, frMsg + s.getName() + " killed everyone!");
+			for (Entity all : p.getWorld().getEntities()) {
+				all.remove();
+				sM(p, frMsg + s.getName() + " enities removed");
 			}
 		}
 	}
@@ -314,12 +550,11 @@ public class GeneralCommandHandler {
 	}
 
 	public static void ciCommand(CommandSender s, Command c, String l, String[] a) {
-		Player p = (Player) s;
-
-		p.getInventory().clear();
-
-		p.sendMessage(frMsg + gold + "You have cleared your Inventory.");
-
+		if (l.equalsIgnoreCase("clearinventory") || l.equalsIgnoreCase("ci")) {
+			Player p = (Player) s;
+			p.getInventory().clear();
+			p.sendMessage(frMsg + gold + "You have cleared your Inventory.");
+		}
 	}
 
 	public static void repairCommand(CommandSender s, Command c, String l, String[] a) {
@@ -332,7 +567,7 @@ public class GeneralCommandHandler {
 
 	public static void reloadCommand(CommandSender s, Command c, String l, String[] a) {
 		p = (Player) s;
-		if ((l.equalsIgnoreCase("capslock")) && (a.length == 0)) {
+		if ((l.equalsIgnoreCase("vBox")) && (a.length == 0)) {
 			sM(p, frMsg + gold + "Current commands: " + darkRed + "/vBox (reload");
 
 		}
@@ -346,7 +581,7 @@ public class GeneralCommandHandler {
 	}
 
 	public static void addcursewordCommand(CommandSender s, Command c, String l, String[] a) {
-		if (l.equalsIgnoreCase("curseword") && a[0].equalsIgnoreCase("add")) {
+		if ((l.equalsIgnoreCase("curseword") && a[0].equalsIgnoreCase("add")) || (l.equalsIgnoreCase("cw") && a[0].equalsIgnoreCase("add"))) {
 			if (a.length > 0) {
 				s.sendMessage(ChatColor.GOLD + "You need to provide a word to filter.");
 				s.sendMessage(ChatColor.DARK_RED + "Correct Usage: /curseprevention add <word>");
@@ -363,6 +598,27 @@ public class GeneralCommandHandler {
 			}
 		} else {
 			sM(p, frMsg + red + "Error: please add arguments to the command /curseword add <word>");
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static void vanishCommand(CommandSender s, Command c, String l, String[] a) {
+		if (l.equalsIgnoreCase("vanish")) {
+			if (a.length < 1) {
+				sM(p, frMsg + gold + " ===== Vanish Help ====");
+				sM(p, frMsg + gold + " |    /Vanish on      |");
+				sM(p, frMsg + gold + " |    /Vanish off     |");
+				sM(p, frMsg + gold + " ======================");
+			} else {
+				p = (Player) s;
+				if (a[0].equalsIgnoreCase("on")) {
+					p.hidePlayer(p);
+					sM(p, frMsg + gold + "You've been hidden!");
+					plugin.logger.info(frMsg + p.getName() + " vanished");
+				} else if (a[0].equalsIgnoreCase("off")) {
+					sM(p, frMsg + gold + " you're visible once more!");
+				}
+			}
 		}
 	}
 
@@ -411,7 +667,6 @@ public class GeneralCommandHandler {
 		}
 		return false;
 
-
 	}
 
 	public static void bC(Player p, String s) {
@@ -420,30 +675,5 @@ public class GeneralCommandHandler {
 
 	public static void sM(Player p, String s) {
 		p.sendMessage(s);
-	}
-
-	public static void getinfoCommand(CommandSender s, Command c, String l, String[] a) {
-		p = (Player) s;
-		Player tp = p.getServer().getPlayer(a[0]);
-		if ((l.equalsIgnoreCase("getinfo")) && (a.length == 1)) {
-			s.sendMessage(ChatColor.GOLD + "+" + ChatColor.GOLD + "------------------------" + ChatColor.GOLD + "+");
-			s.sendMessage(ChatColor.AQUA + "IP:" + ChatColor.DARK_AQUA +tp.getAddress().getAddress());
-			s.sendMessage(ChatColor.AQUA + "EXP:" + ChatColor.DARK_AQUA +tp.getExp());
-			s.sendMessage(ChatColor.AQUA + "EntityID:" + ChatColor.DARK_AQUA +tp.getEntityId());
-			s.sendMessage(ChatColor.AQUA + "First Played:" + ChatColor.DARK_AQUA +tp.getFirstPlayed());
-			s.sendMessage(ChatColor.AQUA + "Fly Speed:" + ChatColor.DARK_AQUA +tp.getFlySpeed());
-			s.sendMessage(ChatColor.AQUA + "Food:" + ChatColor.DARK_AQUA +tp.getFoodLevel());
-			s.sendMessage(ChatColor.AQUA + "Health:" + ChatColor.DARK_AQUA +tp.getHealth());
-			s.sendMessage(ChatColor.AQUA + "PlayerTime:" + ChatColor.DARK_AQUA +tp.getPlayerTime());
-			s.sendMessage(ChatColor.AQUA + "Ticks Lived:" + ChatColor.DARK_AQUA +tp.getTicksLived());
-			s.sendMessage(ChatColor.AQUA + "Item in hand:" + ChatColor.DARK_AQUA +tp.getItemInHand().getType().getId());
-			s.sendMessage(ChatColor.AQUA + "Gamemode:" + ChatColor.DARK_AQUA +tp.getGameMode().name());
-			s.sendMessage(ChatColor.AQUA + "Position:" + ChatColor.DARK_AQUA + "X:" +tp.getLocation().getBlockX() + "| Z:" + tp.getLocation().getBlockZ() + "|Y:" + tp.getLocation().getBlockY()) ;
-			s.sendMessage(ChatColor.AQUA + "Unique ID:" + ChatColor.DARK_AQUA +tp.getUniqueId());
-			s.sendMessage(ChatColor.AQUA + "World:" + ChatColor.DARK_AQUA +tp.getWorld().getName());
-			s.sendMessage(ChatColor.AQUA + "EyeHeight:" + ChatColor.DARK_AQUA +tp.getEyeHeight());
-			s.sendMessage(ChatColor.AQUA + "BedLocation:" + ChatColor.DARK_AQUA +tp.getBedSpawnLocation().getBlockX() + "| Z:" + tp.getBedSpawnLocation().getBlockZ() + "|Y:" + tp.getBedSpawnLocation().getBlockY());
-			s.sendMessage(ChatColor.GOLD + "+" + ChatColor.GOLD + "------------------------" + ChatColor.GOLD + "+");
-		}
 	}
 }

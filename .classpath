@@ -2,8 +2,16 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="D:/Thuis/Developement/Java/Libraries/bukkit-1.6.2-R0.2-20130813.060124-7.jar"/>
-	<classpathentry kind="lib" path="D:/Thuis/Developement/Java/Libraries/craftbukkit-1.6.2-R0.2-20130814.074349-13.jar"/>
-	<classpathentry kind="lib" path="D:/Thuis/Developement/Java/Libraries/Vault.jar"/>
+	<classpathentry kind="lib" path="D:/Developement/Java/Libs/bukkit-1.7.2-R0.1-20131201.031854-2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jd.bukkit.org/dev/apidocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/Developement/Java/Libs/craftbukkit-1.7.2-R0.1-20131201.220431-9.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jd.bukkit.org/dev/apidocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/Developement/Java/Libs/Vault.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

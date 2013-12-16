@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,8 +21,12 @@ import me.vyxisprime.vbox.handlers.GeneralCommandHandler;
 import me.vyxisprime.vbox.handlers.InteractionCommandHandler;
 import me.vyxisprime.vbox.listeners.CapsLockListener;
 import me.vyxisprime.vbox.listeners.CurseWordListener;
+import me.vyxisprime.vbox.listeners.IpListener;
+import me.vyxisprime.vbox.listeners.KitListener;
 import me.vyxisprime.vbox.listeners.PlayerListener;
 import me.vyxisprime.vbox.util.Metrics;
+import me.vyxisprime.vbox.util.VersionCheck;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,30 +36,31 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 	public boolean useMySQL;
 	public final static Logger logger = Logger.getLogger("Minecraft");
 	public static Main plugin;
-	ChatColor darkRed = ChatColor.DARK_RED;
-	ChatColor darkBlue = ChatColor.DARK_BLUE;
-	ChatColor darkGray = ChatColor.DARK_GRAY;
-	ChatColor darkAqua = ChatColor.DARK_AQUA;
-	ChatColor darkGreen = ChatColor.DARK_GREEN;
-	ChatColor darkPurple = ChatColor.DARK_PURPLE;
-	ChatColor red = ChatColor.RED;
-	ChatColor blue = ChatColor.BLUE;
-	ChatColor black = ChatColor.BLACK;
-	ChatColor gray = ChatColor.GRAY;
-	ChatColor gold = ChatColor.GOLD;
-	ChatColor green = ChatColor.GREEN;
-	ChatColor aqua = ChatColor.AQUA;
-	ChatColor pink = ChatColor.LIGHT_PURPLE;
-	ChatColor yellow = ChatColor.YELLOW;
-	ChatColor reset = ChatColor.RESET;
-	ChatColor bold = ChatColor.BOLD;
-	ChatColor white = ChatColor.WHITE;
+	public ChatColor darkRed = ChatColor.DARK_RED;
+	public ChatColor darkBlue = ChatColor.DARK_BLUE;
+	public ChatColor darkGray = ChatColor.DARK_GRAY;
+	public ChatColor darkAqua = ChatColor.DARK_AQUA;
+	public ChatColor darkGreen = ChatColor.DARK_GREEN;
+	public ChatColor darkPurple = ChatColor.DARK_PURPLE;
+	public ChatColor red = ChatColor.RED;
+	public ChatColor blue = ChatColor.BLUE;
+	public ChatColor black = ChatColor.BLACK;
+	public ChatColor gray = ChatColor.GRAY;
+	public ChatColor gold = ChatColor.GOLD;
+	public ChatColor green = ChatColor.GREEN;
+	public ChatColor aqua = ChatColor.AQUA;
+	public ChatColor pink = ChatColor.LIGHT_PURPLE;
+	public ChatColor yellow = ChatColor.YELLOW;
+	public ChatColor reset = ChatColor.RESET;
+	public ChatColor bold = ChatColor.BOLD;
+	public ChatColor white = ChatColor.WHITE;
 	public String frMsg = this.white + "[" + this.green + "vBox" + this.white + "]";
 	PluginDescriptionFile pFile = getDescription();
 
@@ -91,6 +97,12 @@ public class Main extends JavaPlugin {
 	public int maxWarnings;
 	public MySQLDatabase db;
 
+	public VersionCheck vm = new VersionCheck();
+	public static Permission perm = null;
+	boolean vault = true;
+	boolean perms = true;
+	public String latestversion;
+
 	@SuppressWarnings("static-access")
 	public void onDisable() {
 		this.logger.info(frMsg + " " + pFile.getVersion() + " has been succesfully disabled!");
@@ -98,20 +110,30 @@ public class Main extends JavaPlugin {
 
 	@SuppressWarnings("static-access")
 	public void onEnable() {
+		// Version Check
+		this.logger.info(frMsg + " checking version");
+		boolean vcOn = getConfig().getBoolean("CheckForLatestVersion");
+		if (vcOn) {
+			VCThread check = new VCThread(this);
+			this.logger.info(frMsg + "Checking for newer version!");
+			check.start();
+		}
 		this.logger.info(frMsg + " loading Config File");
 		loadConfig();
 		this.logger.info(frMsg + " loading Metrics");
 		try {
-		    Metrics metrics = new Metrics(this);
-		    metrics.start();
+			Metrics metrics = new Metrics(this);
+			metrics.start();
 		} catch (IOException e) {
-		    // Failed to submit the stats :-(
+			// Failed to submit the stats :-(
 		}
 		this.logger.info(frMsg + " loading Events & Listeners");
-		Bukkit.getPluginManager().registerEvents(new Events(), this);
+		Bukkit.getPluginManager().registerEvents(new Events(this), this);
 		Bukkit.getPluginManager().registerEvents(new CapsLockListener(this), this);
 		Bukkit.getPluginManager().registerEvents(new CurseWordListener(), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new IpListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new KitListener(this), this);
 		this.logger.info(frMsg + " setting up MySQL Database");
 		this.db = new MySQLDatabase(this);
 		this.logger.info(frMsg + " " + pFile.getVersion() + " has been succesfully enabled!");
@@ -130,6 +152,7 @@ public class Main extends JavaPlugin {
 			this.logger.info(frMsg + "creating Config File!");
 			saveDefaultConfig();
 		}
+
 		reloadConfig();
 		getStrings();
 		if (this.config.isBoolean("enableNoCaps")) {
@@ -180,6 +203,42 @@ public class Main extends JavaPlugin {
 		return true;
 	}
 
+	private class VC implements Runnable {
+		private String message;
+
+		private VC(String message) {
+			this.message = message;
+		}
+
+		@SuppressWarnings("static-access")
+		public void run() {
+			Main.this.logger.info(plugin.frMsg + this.message);
+		}
+	}
+
+	private class VCThread extends Thread {
+		private Main skit;
+
+		private VCThread(Main i) {
+			this.skit = i;
+		}
+
+		@SuppressWarnings({ "static-access", "deprecation" })
+		public void run() {
+			try {
+				Main.this.latestversion = Main.this.vm.getLatestVersion();
+				if (Main.this.latestversion == null) {
+					Main.this.logger.info("[Main] Could not find a new Version than " + Main.this.getDescription().getVersion() + ".");
+				} else if (Main.this.vm.compareVersion(Main.this.latestversion, this.skit.getDescription().getVersion())) {
+					this.skit.getServer().getScheduler().scheduleSyncDelayedTask(this.skit, new VC("New version of vBox available: " + Main.this.latestversion + ". You have version " + Main.this.getDescription().getVersion()), 0L);
+				}
+			} catch (MalformedURLException mue) {
+				Main.this.logger.info("[Main] Main could not find a newer Version!");
+			}
+			stop();
+		}
+	}
+
 	public void getStrings() {
 		this.broadcastBan = plugin.getConfig().getString("broadcast.Ban", "&6Player &e%victim%&6 was banned by &e%admin%&6! Reason: &e%reason%");
 		this.broadcastKick = plugin.getConfig().getString("broadcast.Kick", "&6Player &e%victim%&6 was kicked by &e%admin%&6! Reason: &e%reason%");
@@ -210,10 +269,17 @@ public class Main extends JavaPlugin {
 		plugin.getConfig().set("broadcast.Unban", this.broadcastUnban);
 		plugin.getConfig().set("broadcast.warn", this.broadcastWarn);
 		plugin.getConfig().set("user.Kick", this.userKick);
-		plugin.getConfig().set("user.ban", this.userBan);
+		plugin.getConfig().set("user.Ban", this.userBan);
 		plugin.getConfig().set("user.TempBan", this.userTempBan);
 		plugin.getConfig().set("user.IPban", this.userIPBan);
 		plugin.getConfig().set("user.warn", this.userWarn);
+
+		plugin.getConfig().addDefault("IP.Message.NotPermitted", "&cYou're not permitted to spam with IP'S");
+		plugin.getConfig().addDefault("IP.Message.KickMessage", "&cYou got kicked for: Spamming with IP's");
+		plugin.getConfig().addDefault("IP.Message.BanMessage", "&cYou got banned for: Spamming with IP's");
+		plugin.getConfig().addDefault("IP.Action.Kick", Boolean.valueOf(false));
+		plugin.getConfig().addDefault("IP.Action.Ban", Boolean.valueOf(false));
+
 		saveConfig();
 	}
 
@@ -796,6 +862,21 @@ public class Main extends JavaPlugin {
 			return true;
 		}
 		return false;
+	}
+
+	@SuppressWarnings("unused")
+	private boolean setupPermissions() {
+		if ((this.vault) && (this.perms)) {
+			if (getServer().getPluginManager().getPlugin("Vault") == null) {
+				return false;
+			}
+		}
+		RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+		if (rsp == null) {
+			return false;
+		}
+		perm = (Permission) rsp.getProvider();
+		return perm != null;
 	}
 
 	public Boolean empBan(String[] trimmedArgs) {

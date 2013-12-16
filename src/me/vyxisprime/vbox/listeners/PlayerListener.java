@@ -1,5 +1,7 @@
 package me.vyxisprime.vbox.listeners;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 
@@ -70,6 +72,19 @@ public class PlayerListener implements Listener {
 			kickMsg = kickMsg.replace("%reason%", playerInfo.reason);
 
 			player.kickPlayer(this.plugin.formatMessage(kickMsg));
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerConfigCreate(PlayerJoinEvent e) {
+		Player p = e.getPlayer();
+		File playerFile = new File( plugin.getDataFolder(), p.getName() + "/signs.yml");
+		if (!playerFile.exists()) {
+			try {
+				playerFile.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }
