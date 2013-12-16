@@ -25,6 +25,11 @@ Changelog
 	- Made Config File User Friedly
 	- added plugin.yml
 	- Added Metrics for MCStats.com
+1.7
+	- added kits
+	- added weather command
+	- added time command
+	- added Ipbanner
 TODO:
 	- Homes/SetHome
 	- Warps
